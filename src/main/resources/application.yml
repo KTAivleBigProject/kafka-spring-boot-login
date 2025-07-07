@@ -1,3 +1,46 @@
 spring:
   application:
     name: demo
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: default
+  # Kafka Broker 주소 설정
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: my-simple-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+
+# Spring Boot 포트 변경 (Kafka-UI와 충돌 방지, 8090 이후 포트 사용)
+server:
+  port: 8090
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: docker
+  # Kafka Broker 주소 설정
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: my-simple-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+
+server:
+  port: 8080
