@@ -6,7 +6,6 @@ import com.example.demo.domain.service.KafkaProducerService;
 
 @RestController
 @RequestMapping("/demo")
-@CrossOrigin(origins = "*")
 public class DemoController {
 
     private final KafkaProducerService producerService;
