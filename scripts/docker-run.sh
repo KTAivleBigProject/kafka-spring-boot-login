@@ -33,7 +33,7 @@ echo "🚀 [$SERVICE_NAME] 빌드 및 컨테이너 실행 중..."
 # Maven 빌드
 ./gradlew build -x test || { echo "❌ Gradle 빌드 실패"; exit 1; }
 
-TAG="${DOCKER_HUB_ID}/${SERVICE_NAME}:latest"
+TAG="${DOCKER_HUB_ID}/${SERVICE_NAME}:dev"
 
 # 도커 이미지 빌드
 docker build -t "$TAG" . || { echo "❌ Docker 빌드 실패: $TAG"; exit 1; }

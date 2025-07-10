@@ -80,7 +80,7 @@ az aks get-credentials --resource-group <마이크로소프트 리소스 그룹>
 ## 쿠버네티스 설정 실행
 
 ```
-kubectl apply -f kubernetes/deploy.yml
+bash scripts/kube-run.sh <DOCKER HUB ID>
 ```
 
 - 각 설정에 따라 `kubernetes/deploy.yml` 을 수정해주세요.
