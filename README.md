@@ -23,7 +23,7 @@ kafka 연결을 위한 java spring boot 보일러 플레이트 저장소 입니�
 - docker compose: v2.x ('25.7.7 기준 lts)
 - java: v21.x ('25.7.7 기준 lts)
 
-# 사용법
+# 사용법 (도커, 개발환경)
 
 ## 실행
 
@@ -50,4 +50,48 @@ curl -X GET "http://localhost:8080/demo/message?message=Hello"
 ## 서비스 변경
 
 - 전체적으로 `example.demo` 로 되어있는 모든 것을 수정해주세요.
-- 수정 후 `gateway` 저장소의 서비스도 수정해야합니다. 
+- 수정 후 `gateway` 저장소의 서비스도 수정해야합니다.
+
+# 배포 (쿠버네티스)
+
+## 사전 설정
+
+### azure 설치
+
+```
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+```
+
+### azure 로그인
+
+```
+az login --use-device-code
+```
+
+### 쿠버네티스 클러스터 연결
+
+```
+az aks get-credentials --resource-group <마이크로소프트 리소스 그룹> --name <마이크로소프트 쿠버네티스 클러스터>
+```
+
+## 쿠버네티스 설정 실행
+
+```
+kubectl apply -f kubernetes/deploy.yml
+```
+
+- 각 설정에 따라 `kubernetes/deploy.yml` 을 수정해주세요.
+- image 는 docker hub에 올린 이미지 사용 (기본: `chldlsrb1000/demo-service:latest`)
+
+### 추가 명령어
+
+```
+# 제거하기
+kubectl delete -f kubernetes/deploy.yml
+
+# 확인하기 (pods, services, deployments..)
+kubectl get all
+
+# 로그확인(-f: 실시간 옵션)
+kubectl logs <POD NAME>
+```
