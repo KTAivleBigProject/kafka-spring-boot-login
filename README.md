@@ -74,6 +74,9 @@ az login --use-device-code
 az aks get-credentials --resource-group <마이크로소프트 리소스 그룹> --name <마이크로소프트 쿠버네티스 클러스터>
 ```
 
+### 쿠버네티스 CLI 도구 설치
+- 링크 참조: https://kubernetes.io/ko/docs/tasks/tools/install-kubectl-linux/
+
 ## 쿠버네티스 설정 실행
 
 ```
