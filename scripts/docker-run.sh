@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 공통 설정
-NETWORK="docker_default" # 도커 네트워크 이름(kafka docker compose 경로 + 프로필)
+NETWORK="kafka_docker_network" # 도커 네트워크 이름(kafka + docker compose 네트워크)
 PROFILE="docker"
 
 # 사용자명 인자 체크
@@ -48,6 +48,7 @@ docker rm -f $SERVICE_NAME 2>/dev/null
 docker run -d --name $SERVICE_NAME \
   $PORT_OPTS \
   --network "$NETWORK" \
+  -e SPRING_PROFILES_ACTIVE="$PROFILE" \
   "$TAG"
 
 # 불필요한 이미지 및 컨테이너 정리

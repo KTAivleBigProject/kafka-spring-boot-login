@@ -3,7 +3,7 @@
 # 사용자명 인자 체크
 if [ -z "$1" ] || [ -z "$2" ]; then
   echo "❌ Docker Hub 사용자명과 서비스이름을 인자로 입력해주세요."
-  echo "예시: bash ./scripts/docker-run.sh chldlsrb1000 demo-service"
+  echo "예시: bash ./scripts/kube-run.sh chldlsrb1000 demo-service"
   exit 1
 fi
 
