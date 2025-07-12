@@ -33,12 +33,6 @@ bash ./scripts/docker-run.sh <DOCKER HUB ID> <SERVICE NAME> <SERVICE PORT: 옵�
 - 위 명령어 사용시 `java 빌드 -> docker 빌드 -> docker push -> docker run` 순서로 진행됩니다.
 - `SERVICE PORT` 는 외부에서 접근 가능한 포트입니다.
 
-```
-cd docker
-docker compose up -d
-```
-- 위 명령어 사용시 kafka, kafka-ui 가 동작합니다.
-
 ### 테스트
 
 ```
@@ -97,4 +91,8 @@ kubectl get all
 
 # 로그확인(-f: 실시간 옵션)
 kubectl logs <POD NAME>
+
+# 바로 재반영
+kubectl get deployment  # 확인
+kubectl rollout restart deployment/gateway  # 재반영
 ```
