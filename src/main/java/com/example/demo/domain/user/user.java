@@ -14,7 +14,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private Long id;
+    private Long userId;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -24,8 +24,4 @@ public class User {
 
     @Column(nullable = false)
     private String name;
-
-    // 글 작성자와의 관계 (양방향)
-    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    // private List<Post> posts;   ← 나중에 구현할 때 추가
 }

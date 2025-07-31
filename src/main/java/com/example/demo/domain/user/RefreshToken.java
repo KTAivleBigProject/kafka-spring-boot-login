@@ -1,18 +1,19 @@
 package com.example.demo.domain.user;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.*;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class RefreshToken {
 
     @Id
-    private String email; // 유저 식별자
+    private Long userId;
 
-    @Column(nullable = false)
     private String token;
 }

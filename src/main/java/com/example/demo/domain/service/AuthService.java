@@ -11,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -23,23 +21,23 @@ public class AuthService {
     private final JwtService jwtService;
 
     // ✅ 회원가입
-    public void signup(String email, String password, String name) {
-        if (userRepository.findByEmail(email).isPresent()) {
+    public void signup(SignupRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("이미 가입된 이메일입니다.");
         }
 
-        String encodedPassword = passwordEncoder.encode(password);
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
 
         User user = User.builder()
-                .email(email)
+                .email(request.getEmail())
                 .password(encodedPassword)
-                .name(name)
+                .name(request.getName())
                 .build();
 
         userRepository.save(user);
     }
 
-    // ✅ 로그인 → Access + Refresh 발급
+    // ✅ 로그인
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
@@ -51,9 +49,8 @@ public class AuthService {
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
-        // 기존 refreshToken 있으면 덮어쓰기
         RefreshToken token = RefreshToken.builder()
-                .email(user.getEmail())
+                .userId(user.getUserId()) // userId 기준 저장
                 .token(refreshToken)
                 .build();
 
@@ -64,24 +61,24 @@ public class AuthService {
 
     // ✅ 토큰 재발급
     public String refresh(String refreshToken) {
-        String email = jwtService.extractEmail(refreshToken);
+        //이 토큰이 어떤 사용자의 것인지 확인하는 과정
+        Long userId = jwtService.extractUserId(refreshToken); // userId 추출
 
-        // DB에 저장된 refreshToken과 비교
-        RefreshToken saved = refreshTokenRepository.findById(email)
+        RefreshToken saved = refreshTokenRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Refresh Token이 존재하지 않습니다."));
 
         if (!saved.getToken().equals(refreshToken)) {
             throw new RuntimeException("Refresh Token이 일치하지 않습니다.");
         }
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자 정보가 없습니다."));
 
-        return jwtService.generateToken(user); // 새로운 Access Token 반환
+        return jwtService.generateToken(user);
     }
 
-    // ✅ 로그아웃 → Refresh Token 삭제
-    public void logout(String email) {
-        refreshTokenRepository.deleteById(email);
+    // ✅ 로그아웃
+    public void logout(Long userId) {
+        refreshTokenRepository.deleteById(userId);
     }
 }
