@@ -12,35 +12,26 @@ import java.util.Date;
 public class JwtService {
 
     private static final String SECRET_KEY = "my-secret-key-for-jwt-very-secret-and-long";
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1시간
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60;
 
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
-    // ✅ access token 생성
+    // ✅ Access Token 생성 (subject에 email 저장)
     public String generateToken(User user) {
         return Jwts.builder()
-                .setSubject(String.valueOf(user.getUserId())) // userId를 subject에 저장
+                .setSubject(user.getEmail())  // ✅ email이 username
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // ✅ refresh token 생성 (7일)
-    public String generateRefreshToken(User user) {
-        return Jwts.builder()
-                .setSubject(String.valueOf(user.getUserId()))
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+    // ✅ email 추출
+    public String extractEmail(String token) {
+        return parseClaims(token).getSubject();
     }
 
-    // ✅ userId 추출
-    public Long extractUserId(String token) {
-        return Long.parseLong(parseClaims(token).getSubject());
-    }
-
+    // ✅ 유효성 검사
     public boolean validateToken(String token) {
         try {
             parseClaims(token);
@@ -50,11 +41,21 @@ public class JwtService {
         }
     }
 
+    // ✅ JWT 클레임 추출
     private Claims parseClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    // ✅ 헤더에서 Bearer 토큰 추출
+    public String resolveToken(javax.servlet.http.HttpServletRequest request) {
+        String bearer = request.getHeader("Authorization");
+        if (bearer != null && bearer.startsWith("Bearer ")) {
+            return bearer.substring(7);
+        }
+        return null;
     }
 }
