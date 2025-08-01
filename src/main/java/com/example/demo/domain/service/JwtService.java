@@ -3,6 +3,7 @@ package com.example.demo.domain.service;
 import com.example.demo.domain.user.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;  // ✅ 변경된 패키지
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -51,11 +52,21 @@ public class JwtService {
     }
 
     // ✅ 헤더에서 Bearer 토큰 추출
-    public String resolveToken(javax.servlet.http.HttpServletRequest request) {
+    public String resolveToken(HttpServletRequest request) {
         String bearer = request.getHeader("Authorization");
         if (bearer != null && bearer.startsWith("Bearer ")) {
             return bearer.substring(7);
         }
         return null;
+    }
+
+    // ✅ Refresh Token 생성 (7일 유효)
+    public String generateRefreshToken(User user) {
+        return Jwts.builder()
+                .setSubject(user.getEmail())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 7일
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
     }
 }

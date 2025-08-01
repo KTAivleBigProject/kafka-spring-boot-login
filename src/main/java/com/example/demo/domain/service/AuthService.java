@@ -20,7 +20,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    // ✅ 회원가입
+    // ✅ [1] 회원가입
     public void signup(SignupRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("이미 가입된 이메일입니다.");
@@ -37,7 +37,7 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    // ✅ 로그인
+    // ✅ [2] 로그인 → 토큰 발급
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
@@ -50,7 +50,7 @@ public class AuthService {
         String refreshToken = jwtService.generateRefreshToken(user);
 
         RefreshToken token = RefreshToken.builder()
-                .userId(user.getUserId()) // userId 기준 저장
+                .email(user.getEmail())  // ✅ userId → email 기준으로 저장
                 .token(refreshToken)
                 .build();
 
@@ -59,26 +59,25 @@ public class AuthService {
         return new LoginResponse(accessToken, refreshToken);
     }
 
-    // ✅ 토큰 재발급
+    // ✅ [3] 토큰 재발급
     public String refresh(String refreshToken) {
-        //이 토큰이 어떤 사용자의 것인지 확인하는 과정
-        Long userId = jwtService.extractUserId(refreshToken); // userId 추출
+        String email = jwtService.extractEmail(refreshToken);  // ✅ email 추출
 
-        RefreshToken saved = refreshTokenRepository.findById(userId)
+        RefreshToken saved = refreshTokenRepository.findById(email)
                 .orElseThrow(() -> new RuntimeException("Refresh Token이 존재하지 않습니다."));
 
         if (!saved.getToken().equals(refreshToken)) {
             throw new RuntimeException("Refresh Token이 일치하지 않습니다.");
         }
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("사용자 정보가 없습니다."));
 
         return jwtService.generateToken(user);
     }
 
-    // ✅ 로그아웃
-    public void logout(Long userId) {
-        refreshTokenRepository.deleteById(userId);
+    // ✅ [4] 로그아웃 (refreshToken 삭제)
+    public void logout(String email) {  // ✅ userId → email 기반으로 변경
+        refreshTokenRepository.deleteById(email);
     }
 }

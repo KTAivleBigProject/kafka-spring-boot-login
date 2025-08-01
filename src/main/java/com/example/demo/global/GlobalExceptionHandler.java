@@ -1,19 +1,19 @@
-package com.example.demo.domain.global;
+package com.example.demo.global; // 패키지 위치도 확인하세요
 
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
 
 @Slf4j
-@ControllerAdvice
+@RestControllerAdvice // ✅ ControllerAdvice는 제거해도 됨
 public class GlobalExceptionHandler {
 
-    // ✅ RuntimeException 처리 (예: 사용자 없음, 비밀번호 틀림 등)
+    // ✅ RuntimeException 처리
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
         log.warn("⚠️ RuntimeException: {}", e.getMessage());
@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", e.getMessage()));
     }
 
-    // ✅ 만료된 JWT 토큰 처리
+    // ✅ JWT 토큰 만료 처리
     @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<?> handleExpiredJwtException(ExpiredJwtException e) {
         log.warn("🔒 Expired JWT Token");
@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", "토큰이 만료되었습니다."));
     }
 
-    // ✅ 기타 예외
+    // ✅ 기타 예외 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception e) {
         log.error("❗예상치 못한 오류: {}", e.getMessage());

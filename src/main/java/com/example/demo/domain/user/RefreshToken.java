@@ -13,7 +13,7 @@ import lombok.*;
 public class RefreshToken {
 
     @Id
-    private Long userId;
+    private String email; // ✅ email 기준으로 변경
 
     private String token;
 }

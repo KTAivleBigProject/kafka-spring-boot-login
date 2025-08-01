@@ -7,13 +7,14 @@ import com.example.demo.domain.service.KafkaProducerService;
 @RestController
 @RequestMapping("/demo")
 public class DemoController {
-
+    
     private final KafkaProducerService producerService;
-
+    
+    
     public DemoController(KafkaProducerService producerService) {
         this.producerService = producerService;
     }
-
+    
     @GetMapping("/message")
     public String publishMessage(@RequestParam String message) {
         producerService.sendMessage(message);

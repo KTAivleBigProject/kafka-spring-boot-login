@@ -1,8 +1,6 @@
 package com.example.demo.domain.security;
 
 import com.example.demo.domain.service.JwtService;
-import com.example.demo.domain.service.CustomUserDetailsService;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,10 +29,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = jwtService.resolveToken(request); // ✅ 여기 수정
+        String token = jwtService.resolveToken(request); // Authorization 헤더에서 JWT 추출
+
         try {
             if (token != null && jwtService.validateToken(token)) {
-                String email = jwtService.extractEmail(token); // ✅ 여기 수정
+                String email = jwtService.extractEmail(token);  // ✅ email 추출
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
 
                 UsernamePasswordAuthenticationToken auth =
@@ -44,11 +43,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             filterChain.doFilter(request, response);
-
-        } catch (ExpiredJwtException e) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.setContentType("application/json");
-            response.getWriter().write("{\"message\": \"토큰이 만료되었습니다.\"}");
 
         } catch (Exception e) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());

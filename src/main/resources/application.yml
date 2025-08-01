@@ -8,9 +8,8 @@ spring:
   config:
     activate:
       on-profile: default
-  # Kafka Broker 주소 설정
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: localhost:9092 
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -19,8 +18,20 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       auto-offset-reset: earliest
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver ## localhost:8090/h2-console
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
 
-# Spring Boot 포트 변경 (Kafka-UI와 충돌 방지, 8090 이후 포트 사용)
 server:
   port: 8090
 
@@ -30,7 +41,6 @@ spring:
   config:
     activate:
       on-profile: docker
-  # Kafka Broker 주소 설정
   kafka:
     bootstrap-servers: kafka:9092
     producer:
@@ -49,9 +59,8 @@ server:
 
 spring:
   config:
-      activate:
-        on-profile: kubernetes
-  # Kafka Broker 주소 설정
+    activate:
+      on-profile: kubernetes
   kafka:
     bootstrap-servers: kafka-svc:9092
     producer:
