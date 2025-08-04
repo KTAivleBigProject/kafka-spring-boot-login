@@ -31,8 +31,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String requestURI = request.getRequestURI();
 
-        // ✅ H2 콘솔 접근은 필터에서 제외
-        if (requestURI.startsWith("/h2-console")) {
+        // ✅ JWT 인증 없이 접근 허용할 경로들
+        if (requestURI.startsWith("/auth") ||
+            requestURI.equals("/users") ||
+            requestURI.startsWith("/h2-console")) {
             filterChain.doFilter(request, response);
             return;
         }

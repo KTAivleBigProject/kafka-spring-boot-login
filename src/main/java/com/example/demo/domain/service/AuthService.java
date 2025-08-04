@@ -37,7 +37,7 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    // ✅ [2] 로그인 → 토큰 발급
+    // ✅ [2] 로그인 → 토큰 발급 + 사용자 이름 포함
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
@@ -50,18 +50,18 @@ public class AuthService {
         String refreshToken = jwtService.generateRefreshToken(user);
 
         RefreshToken token = RefreshToken.builder()
-                .email(user.getEmail())  // ✅ userId → email 기준으로 저장
+                .email(user.getEmail())
                 .token(refreshToken)
                 .build();
 
         refreshTokenRepository.save(token);
 
-        return new LoginResponse(accessToken, refreshToken);
+        return new LoginResponse(accessToken, refreshToken, user.getName(), user.getEmail());
     }
 
     // ✅ [3] 토큰 재발급
     public String refresh(String refreshToken) {
-        String email = jwtService.extractEmail(refreshToken);  // ✅ email 추출
+        String email = jwtService.extractEmail(refreshToken);
 
         RefreshToken saved = refreshTokenRepository.findById(email)
                 .orElseThrow(() -> new RuntimeException("Refresh Token이 존재하지 않습니다."));
@@ -76,8 +76,27 @@ public class AuthService {
         return jwtService.generateToken(user);
     }
 
-    // ✅ [4] 로그아웃 (refreshToken 삭제)
-    public void logout(String email) {  // ✅ userId → email 기반으로 변경
+    // ✅ [4] 로그아웃
+    public void logout(String email) {
         refreshTokenRepository.deleteById(email);
+    }
+
+    // ✅ [5] 이메일 기반 회원 탈퇴
+    public void withdraw(String email) {
+        refreshTokenRepository.deleteById(email);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        userRepository.delete(user);
+    }
+
+    // ✅ [6] userId 기반 회원 탈퇴 (프론트용)
+    public void withdrawById(Integer userId) {
+        User user = userRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        refreshTokenRepository.deleteById(user.getEmail());
+        userRepository.delete(user);
     }
 }

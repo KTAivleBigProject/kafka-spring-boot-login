@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -33,4 +35,11 @@ public class AuthController {
         authService.logout(request.getEmail());
         return ResponseEntity.ok("로그아웃 되었습니다.");
     }
-}
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> withdraw(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        authService.withdraw(email); // ✅ email 기반 삭제 메서드 호출
+        return ResponseEntity.ok().build();
+    }
+}   
