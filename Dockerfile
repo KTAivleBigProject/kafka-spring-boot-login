@@ -4,4 +4,6 @@ EXPOSE 8080
 ENV TZ=Asia/Seoul \
     SPRING_PROFILES_ACTIVE=docker
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-ENTRYPOINT ["java","-Xmx400M","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+
+# ENTRYPOINT ["java","-Xmx400M","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+ENTRYPOINT ["java", "-Xmx400M", "-Djava.security.egd=file:/dev/./urandom", "-Dspring.profiles.active=docker", "-Dspring.h2.console.settings.web-allow-others=true", "-jar", "/app.jar"]

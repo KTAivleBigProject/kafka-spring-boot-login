@@ -29,11 +29,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = jwtService.resolveToken(request); // Authorization 헤더에서 JWT 추출
+        String requestURI = request.getRequestURI();
+
+        // ✅ H2 콘솔 접근은 필터에서 제외
+        if (requestURI.startsWith("/h2-console")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String token = jwtService.resolveToken(request);
 
         try {
             if (token != null && jwtService.validateToken(token)) {
-                String email = jwtService.extractEmail(token);  // ✅ email 추출
+                String email = jwtService.extractEmail(token);
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
 
                 UsernamePasswordAuthenticationToken auth =

@@ -24,16 +24,24 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+        http
+            // ✅ H2 Console만 CSRF 예외 + 전체 CSRF 비활성화
+            .csrf(csrf -> csrf.disable())
+
+            // ✅ iframe 허용
+            .headers(headers -> headers.frameOptions().disable())
+
+            // ✅ 인증 예외 경로 설정
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/auth/**", "/users", "/h2-console/**").permitAll()
+                .anyRequest().authenticated()
+            )
+
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authenticationProvider(authenticationProvider())
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 
     @Bean
