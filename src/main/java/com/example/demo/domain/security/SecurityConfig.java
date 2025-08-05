@@ -34,6 +34,7 @@ public class SecurityConfig {
             // ✅ 인증 예외 경로 설정
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**", "/users", "/h2-console/**").permitAll()
+                .requestMatchers("/api/boards/**").authenticated() // ✅ 추가
                 .anyRequest().authenticated()
             )
 
