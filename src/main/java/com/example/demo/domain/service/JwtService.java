@@ -12,15 +12,16 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "my-secret-key-for-jwt-very-secret-and-long";
+    private static final String SECRET_KEY = "MyVeryLongSecretKeyForJWTTokenGenerationAndValidationThatIsLongEnoughForHMACSHA256AlgorithmSecurity";
     private static final long EXPIRATION_TIME = 1000 * 60 * 60;
 
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
-    // ✅ Access Token 생성 (subject에 email 저장)
+    // ✅ Access Token 생성 (subject에 email 저장, claim에 사용자 이름 추가)
     public String generateToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getEmail())  // ✅ email이 username
+                .claim("name", user.getName()) // ✅ 사용자 이름 추가
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -30,6 +31,11 @@ public class JwtService {
     // ✅ email 추출
     public String extractEmail(String token) {
         return parseClaims(token).getSubject();
+    }
+    
+    // ✅ 사용자 이름 추출
+    public String extractName(String token) {
+        return parseClaims(token).get("name", String.class);
     }
 
     // ✅ 유효성 검사
@@ -64,6 +70,7 @@ public class JwtService {
     public String generateRefreshToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getEmail())
+                .claim("name", user.getName()) // ✅ 사용자 이름 추가
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 7일
                 .signWith(key, SignatureAlgorithm.HS256)
