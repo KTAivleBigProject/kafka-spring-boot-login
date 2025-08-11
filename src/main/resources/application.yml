@@ -78,7 +78,7 @@ spring:
   h2:
     console:
       enabled: true
-      path: /h2-console
+      path: /h2-console-login
     settings:
       web-allow-others: true  # ✅ 이 위치가 핵심!
 
@@ -89,7 +89,7 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
 
 server:
-  port: 8090  # ✅ 로그인 서비스 포트
+  port: 8080  # ✅ 로그인 서비스 포트
 
 ---
 
@@ -130,4 +130,4 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
 
 server:
-  port: 8090  # ✅ 로그인 서비스 포트
+  port: 8080  # ✅ 로그인 서비스 포트
