@@ -56,7 +56,14 @@ public class AuthService {
 
         refreshTokenRepository.save(token);
 
-        return new LoginResponse(accessToken, refreshToken, user.getName(), user.getEmail());
+        String maskedName = maskName(user.getName());
+        return new LoginResponse(accessToken, refreshToken, maskedName, user.getEmail());
+    }
+
+    // 사용자 이름 마스킹 (qw* 형식)
+    private String maskName(String name) {
+        if (name == null || name.length() < 2) return name + "*";
+        return name.substring(0, name.length() - 1) + "*";
     }
 
     // ✅ [3] 토큰 재발급
